@@ -14,12 +14,12 @@ class KategoriController extends Controller
         $kategori = DB::table('kategori')->get();
 
         // Pastikan view foldernya benar (resources/views/admin/kategori/index.blade.php)
-        return view('admin.kategori.index', compact('kategori'));
+        return view('dashboard.admin.data master.kategori.index', compact('kategori'));
     }
 
     public function create()
     {
-        return view('admin.kategori.create');
+        return view('dashboard.admin.data master.kategori.create');
     }
 
     public function store(Request $request)
@@ -43,4 +43,13 @@ class KategoriController extends Controller
         // Cek php artisan route:list untuk memastikan namanya
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan!');
     }
+
+    public function delete($id)
+    {
+        // PERBAIKAN 5: Pastikan kolom yang dihapus sesuai dengan nama kolom di tabel (id_kategori)
+        DB::table('kategori')->where('id_kategori', $id)->delete();
+
+        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil dihapus!');
+    }
 }
+?>

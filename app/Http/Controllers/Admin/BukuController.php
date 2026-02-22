@@ -1,73 +1,102 @@
 <?php
-namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller;
 
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Import DB facade for database operations
+use Illuminate\Support\Facades\DB;
 
 class BukuController extends Controller
 {
+    // --- 1. READ (Tampilkan Data) ---
     public function index()
     {
-        // Fetch all books from the 'buku' table
-        $bukus = DB::table('buku')->leftJoin('kategori', 'buku.kategori_id', '=', 'kategori.id')->select('buku.*', 'kategori.nama as kategori_nama')->get();
+        // Gabungkan tabel BUKU dan KATEGORI
+        $buku = DB::table('buku')
+            ->join('kategori', 'buku.idkategori', '=', 'kategori.idkategori')
+            ->select(
+                'buku.*', 
+                'kategori.nama_kategori' // Ambil nama kategori untuk ditampilkan
+            )
+            ->whereNull('buku.deleted_at') // Hanya ambil yang belum dihapus
+            ->orderBy('buku.idbuku', 'desc')
+            ->get();
 
-        // Return the view with the list of books
-        return view('admin.buku.index', compact('buku'));
+        return view('dashboard.admin.data master.buku.index', compact('buku'));
     }
 
+    // --- 2. CREATE (Form Tambah) ---
     public function create()
     {
-        // Fetch all categories to populate the category dropdown
-        $kategoris = DB::table('kategori')->get();
-
-        // Return the view for creating a new book
-        return view('admin.buku.create', compact('kategori'));
+        // Kita butuh data kategori untuk Dropdown Pilihan
+        $kategori = DB::table('kategori')->whereNull('deleted_at')->get();
+        
+        return view('dashboard.admin.data master.buku.create', compact('kategori'));
     }
 
+    // --- 3. STORE (Simpan Data Baru) ---
     public function store(Request $request)
     {
-        // Validate the incoming request data
+        // Validasi
         $request->validate([
-            'kode' => 'required|unique:buku,kode|max:20',
-            'judul' => 'required|max:500',
-            'pengarang' => 'nullable|max:200',
-            'idkategori' => 'nullable|exists:kategori,idkategori',
+            'kode'       => 'required|unique:buku,kode|max:20',
+            'judul'      => 'required|max:500',
+            'pengarang'  => 'required|max:200',
+            'idkategori' => 'required|exists:kategori,idkategori', // Pastikan ID ada di tabel kategori
         ]);
 
-        // Insert the new book into the database
+        // Insert ke Database
         DB::table('buku')->insert([
-            'judul' => $request->input('judul'),
-            'pengarang' => $request->input('pengarang'),
-            'penerbit' => $request->input('penerbit'),
-            'tahun_terbit' => $request->input('tahun_terbit'),
-            'kategori_id' => $request->input('kategori_id'),
-            'created_at' => now(),
+            'kode'       => $request->kode,
+            'judul'      => $request->judul,
+            'pengarang'  => $request->pengarang,
+            'idkategori' => $request->idkategori,
             'deleted_at' => null,
         ]);
 
-        // Redirect back to the book index page with a success message
-        return redirect()->route('admin.buku.index')->with('success', 'Buku berhasil ditambahkan!');
+        return redirect()->route('buku.index')->with('success', 'Buku berhasil ditambahkan!');
     }
+
+    // --- 4. EDIT (Form Edit) ---
     public function edit($id)
     {
-        // Fetch the book to be edited
-        $buku = DB::table('buku')->where('id', $id)->first();
+        // Ambil data buku berdasarkan idbuku
+        $buku = DB::table('buku')->where('idbuku', $id)->first();
+        
+        // Ambil data kategori untuk Dropdown
+        $kategori = DB::table('kategori')->whereNull('deleted_at')->get();
 
-        // Fetch all categories to populate the category dropdown
-        $kategoris = DB::table('kategori')->get();
-
-        // Return the view for editing the book
-        return view('buku.edit', compact('buku', 'kategori'));
+        return view('dashboard.admin.data master.buku.edit', compact('buku', 'kategori'));
     }
-    public function delete($id)
-    {
-        // Soft delete the book by setting the 'deleted_at' timestamp
-        DB::table('buku')->where('id', $id)->update(['deleted_at' => now()]);
 
-        // Redirect back to the book index page with a success message
-        return redirect()->route('admin.buku.index')->with('success', 'Buku berhasil dihapus!');
+    // --- 5. UPDATE (Simpan Perubahan) ---
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            // Unique tapi abaikan ID buku ini sendiri
+            'kode'       => 'required|max:20|unique:buku,kode,'.$id.',idbuku',
+            'judul'      => 'required|max:500',
+            'pengarang'  => 'required|max:200',
+            'idkategori' => 'required',
+        ]);
+
+        DB::table('buku')->where('idbuku', $id)->update([
+            'kode'       => $request->kode,
+            'judul'      => $request->judul,
+            'pengarang'  => $request->pengarang,
+            'idkategori' => $request->idkategori,
+        ]);
+
+        return redirect()->route('buku.index')->with('success', 'Data buku berhasil diperbarui!');
+    }
+
+    // --- 6. DELETE (Hapus Soft Delete) ---
+    public function destroy($id)
+    {
+        DB::table('buku')->where('idbuku', $id)->update([
+            'deleted_at' => now()
+        ]);
+
+        return redirect()->route('buku.index')->with('success', 'Buku berhasil dihapus!');
     }
 }
-
-?>
