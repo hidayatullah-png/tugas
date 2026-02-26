@@ -19,23 +19,21 @@ class LoginController extends Controller
     protected function redirectTo()
     {
         if (Auth::user()->role_id == 1) {
-            return '/dashboard-admin';
+            return route('dashboard.admin.index');
         }
 
-        return '/dashboard-visitor';
+        return route('dashboard.visitor.index');
     }
 
     public function __construct()
     {
         $this->middleware('guest')->except([
             'logout',
-            'handleGoogleCallback',
-            'verifyOtp'
+            'handleGoogleCallback'
         ]);
 
         $this->middleware('auth')->only([
-            'logout',
-            'verifyOtp'
+            'logout'
         ]);
     }
 
@@ -76,7 +74,7 @@ class LoginController extends Controller
                 ]);
             }
 
-            Auth::login($user);
+            session(['otp_user_id' => $user->id]);
 
             // =========================
             // OTP HANYA UNTUK GOOGLE
@@ -104,23 +102,36 @@ class LoginController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'otp' => 'required'
+            'otp' => 'required|digits:6'
         ]);
 
-        $user = Auth::user();
+        $userId = session('otp_user_id');
+
+        if (!$userId) {
+            return redirect('/login')->with('error', 'Session OTP tidak ditemukan.');
+        }
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            return redirect('/login')->with('error', 'User tidak ditemukan.');
+        }
 
         if ($user->otp == $request->otp) {
 
+            Auth::login($user);
+
             $user->update(['otp' => null]);
 
-            if ($user->role_id == 1) {
-                return redirect('/dashboard-admin');
-            } else {
-                return redirect('/dashboard-visitor');
-            }
+            session()->forget('otp_user_id');
 
-        } else {
-            return back()->with('error', 'OTP salah!');
+            return redirect()->route(
+                $user->role_id == 1
+                ? 'dashboard.admin.index'
+                : 'dashboard.visitor.index'
+            );
         }
+
+        return back()->with('error', 'OTP salah!');
     }
 }

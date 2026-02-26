@@ -8,7 +8,8 @@
         </div>
         <div class="nav-profile-text d-flex flex-column">
           <span class="font-weight-bold mb-2">{{ Auth::user()->name }}</span>
-          <span class="text-secondary text-small">{{ auth()->user()->role_id == 1 ? 'Administrator' : 'Visitor' }}</span>
+          <span
+            class="text-secondary text-small">{{ auth()->user()->role_id == 1 ? 'Administrator' : 'Visitor' }}</span>
         </div>
         <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
       </a>
@@ -27,23 +28,38 @@
       <div class="collapse" id="tables">
         <ul class="nav flex-column sub-menu">
           <li class="nav-item">
-            <a class="nav-link" href="{{ route('buku.index') }}">Data Buku</a>
+            @if(auth()->user()->role_id == 1)
+              <a class="nav-link" href="{{ route('buku.index') }}">Data Buku</a>
+            @else
+              <a class="nav-link" href="{{ route('visitor.buku.index') }}">Data Buku</a>
+            @endif
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ route('kategori.index') }}">Data Kategori</a>
+            @if(auth()->user()->role_id == 1)
+              <a class="nav-link" href="{{ route('kategori.index') }}">Data Kategori</a>
+            @else
+              <a class="nav-link" href="{{ route('visitor.kategori.index') }}">Data Kategori</a>
+            @endif
           </li>
         </ul>
       </div>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="collapse" href="#forms" aria-expanded="false" aria-controls="forms">
-        <span class="menu-title">Forms</span>
-        <i class="mdi mdi-format-list-bulleted menu-icon"></i>
+      <a class="nav-link" data-bs-toggle="collapse" href="#pdfMenu" aria-expanded="false">
+        <span class="menu-title">Generate PDF</span>
+        <i class="mdi mdi-file-pdf menu-icon"></i>
       </a>
-      <div class="collapse" id="forms">
+      <div class="collapse" id="pdfMenu">
         <ul class="nav flex-column sub-menu">
           <li class="nav-item">
-            <a class="nav-link" href="pages/forms/basic_elements.html">Form Elements</a>
+            <a class="nav-link" href="{{ route('pdf.sertifikat') }}">
+              Sertifikat (Landscape)
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('pdf.undangan') }}">
+              Undangan (Portrait)
+            </a>
           </li>
         </ul>
       </div>
@@ -69,10 +85,10 @@
       </a>
       <div class="collapse" id="auth">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"> <a class="nav-link" href="{{ route('pages.blank') }}"> Blank Page </a></li>
+          <li class="nav-item"> <a class="nav-link" href="#blank"> Blank Page </a></li>
           <li class="nav-item"> <a class="nav-link" href="{{ route('login') }}"> Login </a></li>
           <li class="nav-item"> <a class="nav-link" href="{{ route('register') }}"> Register </a></li>
-          <li class="nav-item"> <a class="nav-link" href="{{ route('pages.404') }}"> 404 </a></li>
+          <li class="nav-item"> <a class="nav-link" href="#blabla"> 404 </a></li>
         </ul>
       </div>
     </li>

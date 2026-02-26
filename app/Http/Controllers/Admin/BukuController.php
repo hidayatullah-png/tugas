@@ -22,7 +22,7 @@ class BukuController extends Controller
             ->orderBy('buku.idbuku', 'desc')
             ->get();
 
-        return view('dashboard.admin.data master.buku.index', compact('buku'));
+        return view('dashboard.admin.data_master.buku.index', compact('buku'));
     }
 
     // --- 2. CREATE (Form Tambah) ---
@@ -31,7 +31,7 @@ class BukuController extends Controller
         // Kita butuh data kategori untuk Dropdown Pilihan
         $kategori = DB::table('kategori')->whereNull('deleted_at')->get();
         
-        return view('dashboard.admin.data master.buku.create', compact('kategori'));
+        return view('dashboard.admin.data_master.buku.create', compact('kategori'));
     }
 
     // --- 3. STORE (Simpan Data Baru) ---
@@ -66,7 +66,8 @@ class BukuController extends Controller
         // Ambil data kategori untuk Dropdown
         $kategori = DB::table('kategori')->whereNull('deleted_at')->get();
 
-        return view('dashboard.admin.data master.buku.edit', compact('buku', 'kategori'));
+        // nama view berubah ke "update" agar sesuai file yang ada
+        return view('dashboard.admin.data_master.buku.update', compact('buku', 'kategori'));
     }
 
     // --- 5. UPDATE (Simpan Perubahan) ---
@@ -100,3 +101,4 @@ class BukuController extends Controller
         return redirect()->route('buku.index')->with('success', 'Buku berhasil dihapus!');
     }
 }
+?>

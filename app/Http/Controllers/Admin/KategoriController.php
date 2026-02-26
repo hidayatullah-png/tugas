@@ -14,12 +14,12 @@ class KategoriController extends Controller
         $kategori = DB::table('kategori')->get();
 
         // Pastikan view foldernya benar (resources/views/admin/kategori/index.blade.php)
-        return view('dashboard.admin.data master.kategori.index', compact('kategori'));
+        return view('dashboard.admin.data_master.kategori.index', compact('kategori'));
     }
 
     public function create()
     {
-        return view('dashboard.admin.data master.kategori.create');
+        return view('dashboard.admin.data_master.kategori.create');
     }
 
     public function store(Request $request)
