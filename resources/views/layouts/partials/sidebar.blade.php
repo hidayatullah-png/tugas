@@ -41,6 +41,11 @@
               <a class="nav-link" href="{{ route('visitor.kategori.index') }}">Data Kategori</a>
             @endif
           </li>
+          <li class="nav-item">
+            @if(auth()->user()->role_id == 1)
+              <a class="nav-link" href="{{ route('barang.index') }}">Data Barang</a>
+            @endif
+          </li>
         </ul>
       </div>
     </li>

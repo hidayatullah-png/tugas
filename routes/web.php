@@ -118,13 +118,27 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function () {
 
-    Route::get('/dashboard-admin', [AdminDashboardController::class, 'index'])
-        ->name('dashboard.admin.index');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.admin.index');
 
-    Route::resource('buku', BukuController::class);
-    Route::resource('kategori', KategoriController::class);
-    Route::resource('barang', BarangController::class);
+    // Buku Routes
+    Route::get('/buku', [BukuController::class, 'index'])->name('buku.index');
+    Route::get('/buku/create', [BukuController::class, 'create'])->name('buku.create');
+    Route::post('/buku', [BukuController::class, 'store'])->name('buku.store');
+    Route::get('/buku/{id}/edit', [BukuController::class, 'edit'])->name('buku.edit');
+    Route::put('/buku/{id}', [BukuController::class, 'update'])->name('buku.update');
+    Route::delete('/buku/{id}', [BukuController::class, 'destroy'])->name('buku.destroy');
 
+    // Kategori Routes
+    Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
+    Route::get('/kategori/create', [KategoriController::class, 'create'])->name('kategori.create');
+    Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
+    Route::delete('/kategori/{id}', [KategoriController::class, 'delete'])->name('kategori.destroy');
+
+    Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+    Route::get('/barang/create', [BarangController::class, 'create'])->name('barang.create');
+    Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
+    Route::delete('/barang/{id}', [BarangController::class, 'destroy'])->name('barang.destroy');
+    Route::post('/barang/cetak', [BarangController::class, 'cetak'])->name('barang.cetak');
 });
 
 

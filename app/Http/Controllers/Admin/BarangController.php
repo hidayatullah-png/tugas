@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use app\models\barang;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BarangController extends Controller
 {
+
     public function index()
     {
-        $barang = barang::all();
+        $barang = DB::table('barang')->orderBy('created_at', 'desc')->get();
         return view('dashboard.admin.data_master.barang.index', compact('barang'));
     }
 
@@ -22,38 +24,71 @@ class BarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'harga' => 'required|numeric',
+            'nama' => 'required|max:50',
+            'harga' => 'required|numeric'
         ]);
 
-        Barang::create($request->all());
+        // Generate unique id_barang (BR + 6 digit number)
+        $lastBarang = DB::table('barang')->orderBy('id_barang', 'desc')->first();
 
-        return redirect()->route('admin.barang.index')->with('success','Barang berhasil ditambahkan.');
+        if ($lastBarang) {
+            // Extract number from last id and increment
+            $lastNum = (int) substr($lastBarang->id_barang, 2);
+            $newNum = str_pad($lastNum + 1, 6, '0', STR_PAD_LEFT);
+        } else {
+            $newNum = '000001';
+        }
+
+        $id_barang = 'BR' . $newNum;
+
+        DB::table('barang')->insert([
+            'id_barang' => $id_barang,
+            'nama' => $request->nama,
+            'harga' => $request->harga
+        ]);
+
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan!');
     }
 
-    public function edit(int $id)
-    { 
-        $barang = Barang::findOrFail($id);
-        return view('dashboard.admin.data_master.barang.edit', compact('barang'));
+    public function destroy($id)
+    {
+        DB::table('barang')->where('id_barang', $id)->delete();
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus!');
     }
-
-    public function update(Request $request, int $id)
+    public function cetak(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'harga' => 'required|numeric',
+            'items' => 'required|array',
+            'x' => 'required|integer|min:1|max:5',
+            'y' => 'required|integer|min:1|max:8',
         ]);
 
-        $barang = Barang::findOrFail($id);
-        $barang->update($request->all());
+        $x = $request->x;
+        $y = $request->y;
 
-        return redirect()->route('admin.barang.index')->with('success','Barang berhasil diperbarui.');
-    }
-    public function destroy(int $id)
-    {
-        $barang = Barang::findOrFail($id);
-        $barang->delete();
+        // Hitung posisi awal
+        $offset = ($y - 1) * 5 + ($x - 1);
 
-        return redirect()->route('admin.barang.index')->with('success','Barang berhasil dihapus.');
+        // Ambil barang terpilih
+        $barang = DB::table('barang')
+            ->whereIn('id_barang', $request->items)
+            ->get()
+            ->toArray();
+
+        // Buat array kosong sebanyak offset
+        $data = array_fill(0, $offset, null);
+
+        // Gabungkan offset + barang
+        $data = array_merge($data, $barang);
+
+        // Bagi per 40 label (1 halaman)
+        $pages = array_chunk($data, 40);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+            'dashboard.admin.data_master.barang.pdf',
+            compact('pages')
+        )->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Tag_Harga_TnJ_108.pdf');
     }
 }
