@@ -87,7 +87,7 @@ class BarangController extends Controller
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
             'dashboard.admin.data_master.barang.pdf',
             compact('pages')
-        )->setPaper('a4', 'portrait');
+        )->setPaper('a4', 'landscape');
 
         return $pdf->stream('Tag_Harga_TnJ_108.pdf');
     }

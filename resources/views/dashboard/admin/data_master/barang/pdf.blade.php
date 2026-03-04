@@ -4,35 +4,37 @@
 <head>
     <style>
         @page {
-            size: A4 portrait;
-            margin: 15mm 10mm 15mm 10mm;
+            size: A4 landscape;
+            margin: 0;
         }
 
         body {
-            font-family: sans-serif;
+            font-family: Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .kertas-wrapper {
+            padding-left: 8.5mm;
+            padding-top: 3.5mm;
         }
 
         table {
-            width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 3mm 3mm;
             table-layout: fixed;
         }
 
         td {
-            width: 20%;
-            /* 5 kolom */
-            height: 33mm;
-            /* tinggi label asli */
-            padding: 2mm;
-            vertical-align: middle;
+            width: 37mm;
+            height: 18mm;
             text-align: center;
+            vertical-align: middle;
+            padding: 0;
         }
 
-        .tag-box {
-            border: 1px dashed #ccc;
-            border-radius: 6px;
-            height: 28mm;
-            padding: 2mm;
+        .page-break {
+            page-break-after: always;
         }
     </style>
 </head>
