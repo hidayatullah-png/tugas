@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -10,10 +10,8 @@ class KategoriController extends Controller
 {
     public function index()
     {
-        // PERBAIKAN 1: Nama variabel disamakan dengan compact
         $kategori = DB::table('kategori')->get();
 
-        // Pastikan view foldernya benar (resources/views/admin/kategori/index.blade.php)
         return view('dashboard.admin.data_master.kategori.index', compact('kategori'));
     }
 
@@ -24,32 +22,52 @@ class KategoriController extends Controller
 
     public function store(Request $request)
     {
-        // PERBAIKAN 2: Validasi disesuaikan dengan nama kolom tabel (nama_kategori)
-        // Asumsi: <input name="nama_kategori"> di form HTML kamu
         $request->validate([
             'nama_kategori' => 'required|unique:kategori,nama_kategori|max:100',
         ]);
 
-        // PERBAIKAN 3: Insert ke kolom yang benar
         DB::table('kategori')->insert([
             'nama_kategori' => $request->nama_kategori,
-            
-            // HAPUS 'created_at' => now(), KARENA TABELMU TIDAK PUNYA KOLOM ITU
-            
-            'deleted_at' => null, 
+            'deleted_at' => null,
         ]);
 
-        // PERBAIKAN 4: Route name biasanya 'kategori.index' jika pakai Route::resource
-        // Cek php artisan route:list untuk memastikan namanya
-        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan!');
+        return redirect()->route('kategori.index')
+            ->with('success', 'Kategori berhasil ditambahkan!');
     }
 
-    public function delete($id)
+    public function edit($id)
     {
-        // PERBAIKAN 5: Pastikan kolom yang dihapus sesuai dengan nama kolom di tabel (id_kategori)
-        DB::table('kategori')->where('id_kategori', $id)->delete();
+        $kategori = DB::table('kategori')->where('idkategori', $id)->first();
 
-        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil dihapus!');
+        if (!$kategori) {
+            abort(404);
+        }
+
+        return view('dashboard.admin.data_master.kategori.edit', compact('kategori'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama_kategori' => 'required|max:100|unique:kategori,nama_kategori,' . $id . ',idkategori',
+        ]);
+
+        DB::table('kategori')->where('idkategori', $id)->update([
+            'nama_kategori' => $request->nama_kategori,
+        ]);
+
+        return redirect()->route('kategori.index')
+            ->with('success', 'Kategori berhasil diperbarui!');
+    }
+
+    // lebih baik pakai destroy (standard Laravel)
+    public function destroy($id)
+    {
+        DB::table('kategori')->where('idkategori', $id)->delete();
+
+        return redirect()->route('kategori.index')
+            ->with('success', 'Kategori berhasil dihapus!');
     }
 }
+
 ?>

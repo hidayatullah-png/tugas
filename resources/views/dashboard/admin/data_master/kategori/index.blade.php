@@ -40,6 +40,11 @@
             </td>
             <td class="text-center">
 
+                {{-- Tombol Edit --}}
+                <a href="{{ route('kategori.edit', $item->idkategori) }}" class="btn btn-sm btn-inverse-warning btn-icon d-inline-flex align-items-center justify-content-center" title="Edit">
+                    <i class="mdi mdi-pencil"></i>
+                </a>
+
                 {{-- Tombol Hapus --}}
                 <form onsubmit="return confirm('Apakah Anda yakin ingin menghapus kategori ini?');" 
                       action="{{ route('kategori.destroy', $item->idkategori) }}" 

@@ -14,7 +14,7 @@
                     <p class="card-description"> Isi data buku dengan lengkap dan benar. </p>
 
                     {{-- Form Tambah Buku --}}
-                    <form class="forms-sample" action="{{ route('buku.store') }}" method="POST">
+                    <form id="formBuku" action="{{ route('buku.store') }}" method="POST">
                         @csrf
                         <div class="form-group">
                             <label for="kode">Kode Buku</label>
@@ -47,7 +47,10 @@
                             </select>
                             @error('idkategori') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
-                        <button type="submit" class="btn btn-gradient-primary me-2">Simpan Buku</button>
+                        <button type="button" id="btnSubmit" class="btn btn-gradient-primary me-2">
+                            <span id="btnText">Simpan Buku</span>
+                            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                        </button>
                         <a href="{{ route('buku.index') }}" class="btn btn-light">Batal</a>
                     </form>
                 </div>
@@ -55,5 +58,34 @@
         </div>
     </div>
     </div>
-    
+
+@endsection
+
+@section('scripts')
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("formBuku");
+            const btn = document.getElementById("btnSubmit");
+            const text = document.getElementById("btnText");
+            const spinner = document.getElementById("btnSpinner");
+
+            if (form && btn && text && spinner) {
+                btn.addEventListener("click", function () {
+
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                    }
+
+                    btn.disabled = true;
+                    text.classList.add("d-none");
+                    spinner.classList.remove("d-none");
+
+                    form.submit();
+                });
+            }
+
+        });
+    </script>
 @endsection

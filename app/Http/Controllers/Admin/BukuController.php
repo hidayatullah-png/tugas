@@ -67,7 +67,7 @@ class BukuController extends Controller
         $kategori = DB::table('kategori')->whereNull('deleted_at')->get();
 
         // nama view berubah ke "update" agar sesuai file yang ada
-        return view('dashboard.admin.data_master.buku.update', compact('buku', 'kategori'));
+        return view('dashboard.admin.data_master.buku.edit', compact('buku', 'kategori'));
     }
 
     // --- 5. UPDATE (Simpan Perubahan) ---

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\StudyCaseController;
 
 // Admin
 use App\Http\Controllers\Admin\{
@@ -132,13 +133,30 @@ Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function 
     Route::get('/kategori', [KategoriController::class, 'index'])->name('kategori.index');
     Route::get('/kategori/create', [KategoriController::class, 'create'])->name('kategori.create');
     Route::post('/kategori', [KategoriController::class, 'store'])->name('kategori.store');
+    Route::get('/kategori/{id}/edit', [KategoriController::class, 'edit'])->name('kategori.edit');
+    Route::put('/kategori/{id}', [KategoriController::class, 'update'])->name('kategori.update');
     Route::delete('/kategori/{id}', [KategoriController::class, 'delete'])->name('kategori.destroy');
 
     Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
     Route::get('/barang/create', [BarangController::class, 'create'])->name('barang.create');
+    Route::get('/barang/{id}/edit', [BarangController::class, 'edit'])->name('barang.edit');
+    Route::put('/barang/{id}', [BarangController::class, 'update'])->name('barang.update');
     Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
     Route::delete('/barang/{id}', [BarangController::class, 'destroy'])->name('barang.destroy');
     Route::post('/barang/cetak', [BarangController::class, 'cetak'])->name('barang.cetak');
+
+    // Study Case
+    Route::prefix('/study-case')->group(function () {
+        Route::get('/tabel-biasa', [StudyCaseController::class, 'tabelBiasa'])
+            ->name('study-case.barang.tabel-biasa');
+
+        Route::get('/tabel-datatables', [StudyCaseController::class, 'tabelDataTables'])
+            ->name('study-case.barang.tabel-datatables');
+
+        Route::get('/select2-kota', [StudyCaseController::class, 'select2Kota'])
+            ->name('study-case.select2-kota');
+
+    });
 });
 
 
