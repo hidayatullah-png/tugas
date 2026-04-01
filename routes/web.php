@@ -171,7 +171,7 @@ Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function 
     });
 
     // AJAX Endpoints (API Data)
-    Route::get('/barang/search/{kode}', [BarangController::class, 'search'])->name('barang.search');
+    Route::get('/barang/search/{kode}', [KasirController::class, 'search'])->name('barang.search');
 
     // FIXED: Ditambahkan ->name('api.') agar sinkron dengan JavaScript
     Route::prefix('/wilayah')->name('api.')->group(function () {
@@ -181,7 +181,7 @@ Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function 
     });
 
     Route::prefix('/kasir')->group(function () {
-        Route::post('/store', [KasirController::class, 'storeAxios'])->name('kasir.store');
+        Route::post('/store', [KasirController::class, 'store'])->name('kasir.store');
     });
 });
 
