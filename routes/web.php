@@ -14,7 +14,9 @@ use App\Http\Controllers\Admin\{
     AdminDashboardController,
     BukuController,
     KategoriController,
-    BarangController
+    BarangController,
+    WilayahController,
+    KasirController
 };
 
 // Visitor
@@ -156,6 +158,30 @@ Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function 
         Route::get('/select2-kota', [StudyCaseController::class, 'select2Kota'])
             ->name('study-case.select2-kota');
 
+    });
+    // AJAX & Axios Modules (Halaman Tampilan)
+    Route::prefix('/modul-ajax')->group(function () {
+        // Kasir
+        Route::get('/kasir', [KasirController::class, 'index'])->name('modul_ajax.kasir');
+        Route::get('/kasir-axios', [KasirController::class, 'indexAxios'])->name('modul_ajax.kasir-axios');
+
+        // Wilayah
+        Route::get('/wilayah', [WilayahController::class, 'wilayah'])->name('modul_ajax.wilayah');
+        Route::get('/wilayah-axios', [WilayahController::class, 'wilayahAxios'])->name('modul_ajax.wilayah-axios');
+    });
+
+    // AJAX Endpoints (API Data)
+    Route::get('/barang/search/{kode}', [BarangController::class, 'search'])->name('barang.search');
+
+    // FIXED: Ditambahkan ->name('api.') agar sinkron dengan JavaScript
+    Route::prefix('/wilayah')->name('api.')->group(function () {
+        Route::post('/get-kota', [WilayahController::class, 'getKota'])->name('getKota');
+        Route::post('/get-kecamatan', [WilayahController::class, 'getKecamatan'])->name('getKecamatan');
+        Route::post('/get-kelurahan', [WilayahController::class, 'getKelurahan'])->name('getKelurahan');
+    });
+
+    Route::prefix('/kasir')->group(function () {
+        Route::post('/store', [KasirController::class, 'storeAxios'])->name('kasir.store');
     });
 });
 

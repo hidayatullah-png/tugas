@@ -71,6 +71,29 @@
       </div>
     </li>
     <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#stuff" aria-expanded="false" aria-controls="stuff">
+        <span class="menu-title">Modul Jquery & Axios</span>
+        <i class="menu-arrow"></i>
+        <i class="fa fa-inbox menu-icon"></i>
+      </a>
+      <div class="collapse" id="stuff">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('modul_ajax.kasir-axios') }}">Kasir Axios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('modul_ajax.kasir') }}">Kasir jQuery</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('modul_ajax.wilayah-axios') }}">Wilayah Axios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('modul_ajax.wilayah') }}">Wilayah jQuery</a>
+          </li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item">
       <a class="nav-link" data-bs-toggle="collapse" href="#pdfMenu" aria-expanded="false" aria-controls="pdfMenu">
         <span class="menu-title">Generate PDF</span>
         <i class="menu-arrow"></i>
