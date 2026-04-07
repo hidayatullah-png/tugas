@@ -1,119 +1,192 @@
-@extends('layouts.admin.admin')
+@extends('layouts.guest.guest')
 
 @section('content')
-    <div class="page-header">
-      <h3 class="page-title">
-        <span class="page-title-icon bg-gradient-primary text-white me-2">
-          <i class="mdi mdi-home"></i>
-        </span> Dashboard
-      </h3>
-      <nav aria-label="breadcrumb">
-        <ul class="breadcrumb">
-          <li class="breadcrumb-item active" aria-current="page">
-            <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
-          </li>
-        </ul>
-      </nav>
-    </div>
-    
-    <div class="row">
-      <div class="col-md-4 stretch-card grid-margin">
-        <div class="card bg-gradient-danger card-img-holder text-white">
-          <div class="card-body">
-            <img src="{{ asset('assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
-            <h4 class="font-weight-normal mb-3">Weekly Sales <i class="mdi mdi-chart-line mdi-24px float-end"></i></h4>
-            <h2 class="mb-5">$ 15,0000</h2>
-            <h6 class="card-text">Increased by 60%</h6>
+  <div class="page-header">
+    <h3 class="page-title">
+      <span class="page-title-icon bg-gradient-primary text-white me-2">
+        <i class="mdi mdi-food"></i>
+      </span> Kantin Digital
+    </h3>
+    <nav aria-label="breadcrumb">
+      <ul class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">
+          <span></span>Pesan makanan tanpa ribet! <i
+            class="mdi mdi-check-circle-outline icon-sm text-primary align-middle"></i>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="card-title">Menu Tersedia</h4>
+            <select class="form-control form-control-sm w-25" id="filterVendor" onchange="filterMenu(this.value)">
+              <option value="all">Semua Toko</option>
+              @foreach($vendors as $v)
+                <option value="{{ $v->id }}">{{ $v->nama_vendor }}</option>
+              @endforeach
+            </select>
           </div>
-        </div>
-      </div>
-      <div class="col-md-4 stretch-card grid-margin">
-        <div class="card bg-gradient-info card-img-holder text-white">
-          <div class="card-body">
-            <img src="{{ asset('assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
-            <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-end"></i></h4>
-            <h2 class="mb-5">45,6334</h2>
-            <h6 class="card-text">Decreased by 10%</h6>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 stretch-card grid-margin">
-        <div class="card bg-gradient-success card-img-holder text-white">
-          <div class="card-body">
-            <img src="{{ asset('assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
-            <h4 class="font-weight-normal mb-3">Visitors Online <i class="mdi mdi-diamond mdi-24px float-end"></i></h4>
-            <h2 class="mb-5">95,5741</h2>
-            <h6 class="card-text">Increased by 5%</h6>
+
+          <div class="row" id="menu-container">
+            @foreach($makanan as $m)
+              <div class="col-md-6 col-lg-4 grid-margin menu-item" data-vendor="{{ $m->vendor_id }}">
+                <div class="card card-img-holder text-dark border shadow-sm h-100">
+                  <div class="card-body p-3">
+                    <img src="{{ asset('assets/images/dashboard/circle.svg') }}" class="card-img-absolute"
+                      alt="circle-image" />
+                    <p class="text-muted small mb-1"><i class="mdi mdi-store"></i> {{ $m->nama_vendor }}</p>
+                    <h5 class="font-weight-bold mb-2">{{ $m->nama_barang }}</h5>
+                    <h4 class="text-primary mb-3">Rp {{ number_format($m->harga, 0, ',', '.') }}</h4>
+                    <button class="btn btn-gradient-primary btn-sm btn-block"
+                      onclick="tambahKeKeranjang({{ $m->id }}, '{{ $m->nama_barang }}', {{ $m->harga }})">
+                      <i class="mdi mdi-plus"></i> Tambah
+                    </button>
+                  </div>
+                </div>
+              </div>
+            @endforeach
           </div>
         </div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-md-7 grid-margin stretch-card">
-        <div class="card">
-          <div class="card-body">
-            <div class="clearfix">
-              <h4 class="card-title float-start">Visit And Sales Statistics</h4>
-              <div id="visit-sale-chart-legend" class="rounded-legend legend-horizontal legend-top-right float-end"></div>
-            </div>
-            <canvas id="visit-sale-chart" class="mt-4"></canvas>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-5 grid-margin stretch-card">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title">Traffic Sources</h4>
-            <div class="doughnutjs-wrapper d-flex justify-content-center">
-              <canvas id="traffic-chart"></canvas>
-            </div>
-            <div id="traffic-chart-legend" class="rounded-legend legend-vertical legend-bottom-left pt-4"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="col-md-4 grid-margin stretch-card">
+      <div class="card bg-light border-0 shadow-sm sticky-top" style="top: 100px; height: fit-content;">
+        <div class="card-body">
+          <h4 class="card-title text-center"><i class="mdi mdi-cart-outline"></i> Pesanan Saya</h4>
+          <hr>
 
-    <div class="row">
-      <div class="col-12 grid-margin">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title">Recent Tickets</h4>
-            <div class="table-responsive">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th> Assignee </th>
-                    <th> Subject </th>
-                    <th> Status </th>
-                    <th> Last Update </th>
-                    <th> Tracking ID </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <img src="{{ asset('assets/images/faces/face1.jpg') }}" class="me-2" alt="image"> David Grey
-                    </td>
-                    <td> Fund is not recieved </td>
-                    <td><label class="badge badge-gradient-success">DONE</label></td>
-                    <td> Dec 5, 2017 </td>
-                    <td> WD-12345 </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <img src="{{ asset('assets/images/faces/face2.jpg') }}" class="me-2" alt="image"> Stella Johnson
-                    </td>
-                    <td> High loading time </td>
-                    <td><label class="badge badge-gradient-warning">PROGRESS</label></td>
-                    <td> Dec 12, 2017 </td>
-                    <td> WD-12346 </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div class="form-group">
+            <label for="nama_pembeli">Nama Pemesan / No. Meja</label>
+            <input type="text" class="form-control" id="nama_pembeli" placeholder="Contoh: Budi - Meja 5">
           </div>
+
+          <div id="keranjang-list" style="max-height: 300px; overflow-y: auto;">
+            <p class="text-center text-muted my-4">Belum ada makanan terpilih</p>
+          </div>
+
+          <hr>
+          <div class="d-flex justify-content-between mb-4">
+            <h5 class="font-weight-bold">Total</h5>
+            <h4 class="text-primary font-weight-bold" id="total-harga">Rp 0</h4>
+          </div>
+
+          <button class="btn btn-gradient-danger btn-lg btn-block shadow" id="btn-checkout" onclick="checkout()" disabled>
+            <i class="mdi mdi-credit-card"></i> Bayar Sekarang
+          </button>
         </div>
       </div>
     </div>
+  </div>
+@endsection
+
+@section('scripts')
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    let cart = [];
+    let grandTotal = 0;
+
+    function tambahKeKeranjang(id, nama, harga) {
+      let exists = cart.find(item => item.id === id);
+      if (exists) {
+        exists.qty++;
+        exists.subtotal = exists.qty * exists.harga;
+      } else {
+        cart.push({ id: id, nama_barang: nama, harga: harga, qty: 1, subtotal: harga });
+      }
+      renderCart();
+    }
+
+    function hapusItem(id) {
+      cart = cart.filter(item => item.id !== id);
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('keranjang-list');
+      const totalDisplay = document.getElementById('total-harga');
+      const btnCheckout = document.getElementById('btn-checkout');
+
+      container.innerHTML = '';
+      grandTotal = 0;
+
+      if (cart.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted my-4">Belum ada makanan terpilih</p>';
+        btnCheckout.disabled = true;
+      } else {
+        cart.forEach(item => {
+          grandTotal += item.subtotal;
+          container.innerHTML += `
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                            <div>
+                                <p class="mb-0 font-weight-bold">${item.nama_barang}</p>
+                                <small class="text-muted">${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</small>
+                            </div>
+                            <div class="text-right">
+                                <p class="mb-0 text-dark small">Rp ${item.subtotal.toLocaleString('id-ID')}</p>
+                                <button class="btn btn-link text-danger p-0 small" onclick="hapusItem(${item.id})"><i class="mdi mdi-delete"></i></button>
+                            </div>
+                        </div>
+                    `;
+        });
+        btnCheckout.disabled = false;
+      }
+      totalDisplay.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+    }
+
+    function checkout() {
+      const nama = document.getElementById('nama_pembeli').value;
+      if (!nama) {
+        Swal.fire('Nama Kosong', 'Tolong isi nama kamu dulu ya!', 'warning');
+        return;
+      }
+
+      Swal.fire({
+        title: 'Sedang Menyiapkan Pembayaran...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading() }
+      });
+
+      axios.post("{{ route('guest.checkout') }}", {
+        nama_pembeli: nama,
+        total_harga: grandTotal,
+        items: cart
+      })
+        .then(response => {
+          Swal.close();
+          window.snap.pay(response.data.snap_token, {
+            onSuccess: (result) => {
+              Swal.fire('Berhasil!', 'Pesanan kamu sudah dibayar.', 'success').then(() => location.reload());
+            },
+            onPending: (result) => {
+              Swal.fire('Pending', 'Selesaikan pembayaranmu di aplikasi ya!', 'info');
+            },
+            onError: (result) => {
+              Swal.fire('Gagal', 'Pembayaran bermasalah, coba lagi.', 'error');
+            }
+          });
+        })
+        .catch(error => {
+          Swal.close();
+          Swal.fire('Error', error.response.data.message || 'Gagal terhubung ke Midtrans', 'error');
+        });
+    }
+
+    function filterMenu(vendorId) {
+      const items = document.querySelectorAll('.menu-item');
+      items.forEach(item => {
+        if (vendorId === 'all' || item.getAttribute('data-vendor') === vendorId) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+  </script>
 @endsection

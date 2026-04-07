@@ -9,6 +9,11 @@ use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\StudyCaseController;
 
+// --- TAMBAHAN BARU: Import Guest & Vendor Controller ---
+use App\Http\Controllers\GuestController;
+use App\Http\Controllers\Vendor\VendorMakananController as VendorMakananController;
+use App\Http\Controllers\Vendor\VendorPesananController; // <-- Tambahan import pesanan
+
 // Admin
 use App\Http\Controllers\Admin\{
     AdminDashboardController,
@@ -51,6 +56,10 @@ Route::get('/dashboard', function () {
 
     if (Auth::user()->role_id == '2') {
         return redirect()->route('dashboard.visitor.index');
+    }
+
+    if (Auth::user()->role_id == '3') {
+        return redirect()->route('vendor.makanan.index');
     }
 
     abort(403);
@@ -115,7 +124,7 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes
+| Admin Routes (TIDAK DIUBAH SAMA SEKALI)
 |--------------------------------------------------------------------------
 */
 
@@ -188,7 +197,7 @@ Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function 
 
 /*
 |--------------------------------------------------------------------------
-| Visitor Routes
+| Visitor Routes (TIDAK DIUBAH SAMA SEKALI)
 |--------------------------------------------------------------------------
 */
 
@@ -204,4 +213,45 @@ Route::prefix('visitor')->middleware(['auth', 'isVisitor'])->group(function () {
     Route::get('/kategori', [VisitorKategoriController::class, 'index'])
         ->name('visitor.kategori.index');
 
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Guest Order Routes (Pemesanan Kantin - Tanpa Login)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('order')->group(function () {
+    Route::get('/', [GuestController::class, 'index'])->name('guest.index');
+    // --- TAMBAHKAN BARIS INI ---
+    Route::get('/finish', [GuestController::class, 'finish'])->name('guest.finish');
+
+    Route::get('/menu/{vendor_id}', [GuestController::class, 'getMenu'])->name('guest.getMenu');
+    Route::post('/checkout', [GuestController::class, 'checkout'])->name('guest.checkout');
+});
+
+// Callback Midtrans (Wajib di luar middleware auth agar Midtrans bisa mengakses)
+Route::post('/payment/callback', [GuestController::class, 'callback'])->name('midtrans.callback');
+
+
+/*
+|--------------------------------------------------------------------------
+| Vendor Routes (Dashboard Penjual Makanan)
+|--------------------------------------------------------------------------
+*/
+
+// PERHATIKAN BARIS INI: Saya tambahkan middleware 'isVendor' di sini
+Route::prefix('vendor')->middleware(['auth', 'isVendor'])->group(function () {
+
+    // Manajemen Makanan
+    Route::get('/makanan', [VendorMakananController::class, 'index'])->name('vendor.makanan.index');
+    Route::get('/makanan/create', [VendorMakananController::class, 'create'])->name('vendor.makanan.create');
+    Route::post('/makanan', [VendorMakananController::class, 'store'])->name('vendor.makanan.store');
+    Route::get('/makanan/{id}/edit', [VendorMakananController::class, 'edit'])->name('vendor.makanan.edit');
+    Route::put('/makanan/{id}', [VendorMakananController::class, 'update'])->name('vendor.makanan.update');
+    Route::delete('/makanan/{id}', [VendorMakananController::class, 'destroy'])->name('vendor.makanan.destroy');
+
+    // Pesanan Masuk (BARU)
+    Route::get('/pesanan', [VendorPesananController::class, 'index'])->name('vendor.pesanan.index');
 });
