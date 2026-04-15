@@ -35,15 +35,30 @@
             @foreach($makanan as $m)
               <div class="col-md-6 col-lg-4 grid-margin menu-item" data-vendor="{{ $m->vendor_id }}">
                 <div class="card card-img-holder text-dark border shadow-sm h-100">
-                  <div class="card-body p-3">
+
+                  <div class="position-relative">
+                    @if($m->foto)
+                      <img src="{{ asset('storage/menu/' . $m->foto) }}" class="card-img-top" alt="{{ $m->nama_barang }}"
+                        style="height: 160px; object-fit: cover; border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    @else
+                      <img src="{{ asset('assets/images/dashboard/no-food.jpg') }}" class="card-img-top"
+                        style="height: 160px; object-fit: cover; opacity: 0.5;">
+                    @endif
+
                     <img src="{{ asset('assets/images/dashboard/circle.svg') }}" class="card-img-absolute"
-                      alt="circle-image" />
-                    <p class="text-muted small mb-1"><i class="mdi mdi-store"></i> {{ $m->nama_vendor }}</p>
+                      style="opacity: 0.3;" />
+                  </div>
+
+                  <div class="card-body p-3">
+                    <p class="text-muted small mb-1">
+                      <i class="mdi mdi-store text-primary"></i> {{ $m->nama_vendor }}
+                    </p>
                     <h5 class="font-weight-bold mb-2">{{ $m->nama_barang }}</h5>
                     <h4 class="text-primary mb-3">Rp {{ number_format($m->harga, 0, ',', '.') }}</h4>
-                    <button class="btn btn-gradient-primary btn-sm btn-block"
+
+                    <button class="btn btn-gradient-primary btn-sm btn-block shadow-sm"
                       onclick="tambahKeKeranjang({{ $m->id }}, '{{ $m->nama_barang }}', {{ $m->harga }})">
-                      <i class="mdi mdi-plus"></i> Tambah
+                      <i class="mdi mdi-plus"></i> Tambah ke Pesanan
                     </button>
                   </div>
                 </div>
@@ -123,17 +138,17 @@
         cart.forEach(item => {
           grandTotal += item.subtotal;
           container.innerHTML += `
-                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                            <div>
-                                <p class="mb-0 font-weight-bold">${item.nama_barang}</p>
-                                <small class="text-muted">${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</small>
+                            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                <div>
+                                    <p class="mb-0 font-weight-bold">${item.nama_barang}</p>
+                                    <small class="text-muted">${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</small>
+                                </div>
+                                <div class="text-right">
+                                    <p class="mb-0 text-dark small">Rp ${item.subtotal.toLocaleString('id-ID')}</p>
+                                    <button class="btn btn-link text-danger p-0 small" onclick="hapusItem(${item.id})"><i class="mdi mdi-delete"></i></button>
+                                </div>
                             </div>
-                            <div class="text-right">
-                                <p class="mb-0 text-dark small">Rp ${item.subtotal.toLocaleString('id-ID')}</p>
-                                <button class="btn btn-link text-danger p-0 small" onclick="hapusItem(${item.id})"><i class="mdi mdi-delete"></i></button>
-                            </div>
-                        </div>
-                    `;
+                        `;
         });
         btnCheckout.disabled = false;
       }
@@ -162,7 +177,16 @@
           Swal.close();
           window.snap.pay(response.data.snap_token, {
             onSuccess: (result) => {
-              Swal.fire('Berhasil!', 'Pesanan kamu sudah dibayar.', 'success').then(() => location.reload());
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Menampilkan QR Code...',
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                // Redirect ke route payment.finish (yang mengarah ke VendorPesananController@selesai)
+                window.location.href = "{{ route('payment.finish') }}?order_id=" + result.order_id;
+              });
             },
             onPending: (result) => {
               Swal.fire('Pending', 'Selesaikan pembayaranmu di aplikasi ya!', 'info');

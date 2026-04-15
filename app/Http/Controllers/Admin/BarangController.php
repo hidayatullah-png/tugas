@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\PDF;
+
 
 class BarangController extends Controller
 {
@@ -92,29 +94,24 @@ class BarangController extends Controller
         $x = $request->x;
         $y = $request->y;
 
-        // Hitung posisi awal
+        // Hitung posisi awal (offset)
         $offset = ($y - 1) * 5 + ($x - 1);
 
-        // Ambil barang terpilih
         $barang = DB::table('barang')
             ->whereIn('id_barang', $request->items)
             ->get()
             ->toArray();
 
-        // Buat array kosong sebanyak offset
+        // Buat array kosong untuk melompati label yang sudah terpakai
         $data = array_fill(0, $offset, null);
-
-        // Gabungkan offset + barang
         $data = array_merge($data, $barang);
 
-        // Bagi per 40 label (1 halaman)
+        // Bagi per 40 label (standard label TnJ 108 biasanya 1 halaman isi 40 atau sesuai ukuran)
         $pages = array_chunk($data, 40);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
-            'dashboard.admin.data_master.barang.pdf',
-            compact('pages')
-        )->setPaper('a4', 'landscape');
+        $pdf = PDF::loadView('dashboard.admin.data_master.barang.pdf', compact('pages'))
+            ->setPaper('a4', 'landscape');
 
-        return $pdf->stream('Tag_Harga_TnJ_108.pdf');
+        return $pdf->stream('Tag_Harga_Barcode.pdf');
     }
 }

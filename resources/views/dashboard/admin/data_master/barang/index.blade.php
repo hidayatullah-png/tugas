@@ -3,15 +3,26 @@
 @section('content')
 
     <div class="page-header">
-        <h3 class="page-title">Data Barang</h3>
+        <h3 class="page-title">
+            <span class="page-title-icon bg-gradient-primary text-white me-2">
+                <i class="mdi mdi-basket-check"></i>
+            </span> Harga Barang
+        </h3>
+        <nav aria-label="breadcrumb">
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">
+                    <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+                </li>
+            </ul>
+        </nav>
     </div>
 
     <div class="card">
         <div class="card-body">
 
-            <div class="d-flex justify-content-between mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-4">
 
-                <a href="{{ route('barang.create') }}" class="btn btn-primary btn-sm">
+                <a href="{{ route('barang.create') }}" class="mdi mdi-plus btn btn-gradient-primary btn-sm">
                     Tambah Barang
                 </a>
 
@@ -35,11 +46,9 @@
                 </div>
             </div>
 
-
             <form id="form-cetak" action="{{ route('barang.cetak') }}" method="POST">
                 @csrf
             </form>
-
 
             <div class="table-responsive">
                 <table class="table table-bordered">

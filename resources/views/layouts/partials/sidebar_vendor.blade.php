@@ -22,6 +22,28 @@
         </li>
 
         <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#customer-menu" aria-expanded="false"
+                aria-controls="customer-menu">
+                <span class="menu-title">Customer</span>
+                <i class="menu-arrow"></i>
+                <i class="mdi mdi-account-group menu-icon"></i>
+            </a>
+            <div class="collapse" id="customer-menu">
+                <ul class="nav flex-column sub-menu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('vendor.customer.index') }}">Data Customer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('vendor.customer.create1') }}">Tambah Customer 1 (BLOB)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('vendor.customer.create2') }}">Tambah Customer 2 (Path)</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <li class="nav-item">
             <a class="nav-link" href="{{ route('vendor.pesanan.index') }}">
                 <span class="menu-title">Pesanan Masuk</span>
                 <i class="mdi mdi-bell-ring menu-icon"></i>
@@ -46,6 +68,5 @@
                 </ul>
             </div>
         </li>
-
     </ul>
 </nav>

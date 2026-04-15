@@ -11,15 +11,22 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Models\User;
 
-
 class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
+    /**
+     * Redirect setelah login biasa (Email & Password)
+     */
     protected function redirectTo()
     {
         if (Auth::user()->role_id == 1) {
             return route('dashboard.admin.index');
+        }
+
+        // TAMBAHAN: Redirect untuk Vendor
+        if (Auth::user()->role_id == 3) {
+            return route('vendor.makanan.index');
         }
 
         return route('dashboard.visitor.index');
@@ -51,9 +58,7 @@ class LoginController extends Controller
     public function handleGoogleCallback()
     {
         try {
-
             $googleUser = Socialite::driver('google')->user();
-
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
@@ -70,21 +75,15 @@ class LoginController extends Controller
                     'id_google' => $googleUser->getId(),
                     'password' => Hash::make('password_google'),
                     'email_verified_at' => now(),
-                    'role_id' => 2, // otomatis visitor
+                    'role_id' => 2, // Default visitor jika daftar via Google
                 ]);
             }
 
             session(['otp_user_id' => $user->id]);
 
-            // =========================
-            // OTP HANYA UNTUK GOOGLE
-            // =========================
-
+            // Generate OTP
             $otp = rand(100000, 999999);
-
-            $user->update([
-                'otp' => $otp
-            ]);
+            $user->update(['otp' => $otp]);
 
             Mail::raw("Kode OTP login Anda adalah: $otp", function ($message) use ($user) {
                 $message->to($user->email)
@@ -97,8 +96,11 @@ class LoginController extends Controller
             return redirect('/login')
                 ->withErrors('Login dengan Google gagal.');
         }
-
     }
+
+    /**
+     * Verifikasi OTP
+     */
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -106,30 +108,30 @@ class LoginController extends Controller
         ]);
 
         $userId = session('otp_user_id');
-
         if (!$userId) {
             return redirect('/login')->with('error', 'Session OTP tidak ditemukan.');
         }
 
         $user = User::find($userId);
-
         if (!$user) {
             return redirect('/login')->with('error', 'User tidak ditemukan.');
         }
 
         if ($user->otp == $request->otp) {
-
             Auth::login($user);
-
             $user->update(['otp' => null]);
-
             session()->forget('otp_user_id');
 
-            return redirect()->route(
-                $user->role_id == 1
-                ? 'dashboard.admin.index'
-                : 'dashboard.visitor.index'
-            );
+            // TAMBAHAN: Logika redirect berdasarkan role setelah OTP sukses
+            if ($user->role_id == 1) {
+                $targetRoute = 'dashboard.admin.index';
+            } elseif ($user->role_id == 3) {
+                $targetRoute = 'vendor.makanan.index';
+            } else {
+                $targetRoute = 'dashboard.visitor.index';
+            }
+
+            return redirect()->route($targetRoute);
         }
 
         return back()->with('error', 'OTP salah!');

@@ -16,7 +16,7 @@ class PdfController extends Controller
 
     public function potrait()
     {
-        $pdf = PDF::loadView('pdf.potrait')->setPaper('a4', 'portrait');
+        $pdf = PDF::loadView('pdf.portrait')->setPaper('a4', 'portrait');
 
         return $pdf->stream('Undangan_Fakultas.pdf');
     }

@@ -21,7 +21,7 @@
                                 <tr>
                                     <th> No. Faktur </th>
                                     <th> Nama Customer </th>
-                                    <th> Nama Barang </th>
+                                    <th> Nama Makanan </th>
                                     <th> Jumlah </th>
                                     <th> Tanggal Transaksi </th>
                                     <th> Status </th>
