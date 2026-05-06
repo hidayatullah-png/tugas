@@ -38,7 +38,7 @@ class VendorPesananController extends Controller
         return view('dashboard.vendor.data_master.pesanan.index', compact('pesanan'));
     }
     /**
-     * STUDI KASUS 2: Halaman Sukses Payment + QR Code
+     * Halaman Sukses Payment + QR Code (customer)
      * Method ini dipanggil saat Midtrans redirect kembali ke web kita
      */
     public function selesai(Request $request)
@@ -67,6 +67,53 @@ class VendorPesananController extends Controller
         QRCode::text($orderId)->setSize(250)->setOutfile($path)->png();
 
         // 4. Kirim ke view guest
-    return view('dashboard.guest.success', compact('pembayaran', 'filename'));
+        return view('dashboard.guest.success', compact('pembayaran', 'filename'));
+    }
+    //scanner barcode kantin
+    public function scanQR()
+    {
+        return view('dashboard.vendor.data_master.pesanan.scan_qr');
+    }
+    //cek pesanan
+    public function cekPesanan($id)
+    {
+        $pembayaran = DB::table('pembayaran')
+            ->where('nomor_faktur', $id)
+            ->first();
+
+        // Jika pembayaran tidak ditemukan
+        if (!$pembayaran) {
+            return response()->json([
+                'success' => false,
+                'message' => 'QR code tidak valid'
+            ], 404);
+        }
+        //ambil detail pesanan
+        $items = DB::table('detail_pembayaran')
+            ->join('makanan', 'detail_pembayaran.makanan_id', '=', 'makanan.id')
+            ->where('detail_pembayaran.pembayaran_id', $pembayaran->id)
+            ->where('makanan.vendor_id', function ($query) {
+                $query->select('id')
+                    ->from('vendors')
+                    ->where('user_id', auth()->id());
+            })
+            ->select('makanan.nama_barang', 'detail_pembayaran.jumlah', 'detail_pembayaran.subtotal')
+            ->get();
+
+        if ($items->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan untuk vendor ini'
+            ], 403);
+        }
+        return response()->json([
+            'success' => true,
+            'nomor_faktur' => $pembayaran->nomor_faktur,
+            'nama_customer' => $pembayaran->nama_customer,
+            'status_bayar' => $pembayaran->status_bayar,
+            'total_harga' => $pembayaran->total_harga,
+            'tanggal_transaksi' => $pembayaran->tanggal_transaksi,
+            'items' => $items 
+        ], 200);
     }
 }

@@ -73,6 +73,18 @@ Route::prefix('auth/google')->group(function () {
     Route::get('/callback', [LoginController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
+//sertif
+Route::middleware('auth')->group(function () {
+
+    Route::get('/pdf/landscape', [PdfController::class, 'landscape'])
+        ->name('pdf.sertifikat');
+
+    Route::get('/pdf/potrait', [PdfController::class, 'potrait'])
+        ->name('pdf.undangan');
+
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Admin Routes
@@ -82,16 +94,59 @@ Route::prefix('auth/google')->group(function () {
 Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.admin.index');
 
-    // CRUD Barang, Buku, Kategori, dsb... (sesuai kode kamu sebelumnya)
+    // CRUD Barang, Buku, Kategori
     Route::resource('buku', BukuController::class);
     Route::resource('kategori', KategoriController::class);
     Route::resource('barang', BarangController::class);
+    Route::post('/barang/cetak', [BarangController::class, 'cetak'])->name('barang.cetak');
+
+    //studycase
+    // Study Case
+    Route::prefix('/study-case')->group(function () {
+        Route::get('/tabel-biasa', [StudyCaseController::class, 'tabelBiasa'])
+            ->name('study-case.barang.tabel-biasa');
+
+        Route::get('/tabel-datatables', [StudyCaseController::class, 'tabelDataTables'])
+            ->name('study-case.barang.tabel-datatables');
+
+        Route::get('/select2-kota', [StudyCaseController::class, 'select2Kota'])
+            ->name('study-case.select2-kota');
+
+    });
+
+    // AJAX & Axios Modules (Halaman Tampilan)
+    Route::prefix('/modul-ajax')->group(function () {
+        // Kasir
+        Route::get('/kasir', [KasirController::class, 'index'])->name('modul_ajax.kasir');
+        Route::get('/kasir-axios', [KasirController::class, 'indexAxios'])->name('modul_ajax.kasir-axios');
+
+        // Wilayah
+        Route::get('/wilayah', [WilayahController::class, 'wilayah'])->name('modul_ajax.wilayah');
+        Route::get('/wilayah-axios', [WilayahController::class, 'wilayahAxios'])->name('modul_ajax.wilayah-axios');
+    });
+
+    // AJAX Endpoints (API Data)
+    Route::get('/barang/search/{id}', [KasirController::class, 'search'])->name('barang.search');
+
+    Route::prefix('/kasir')->group(function () {
+        Route::post('/store', [KasirController::class, 'store'])->name('kasir.store');
+    });
+
+    // FIXED: Ditambahkan ->name('api.') agar sinkron dengan JavaScript
+    Route::prefix('/wilayah')->name('api.')->group(function () {
+        Route::post('/get-kota', [WilayahController::class, 'getKota'])->name('getKota');
+        Route::post('/get-kecamatan', [WilayahController::class, 'getKecamatan'])->name('getKecamatan');
+        Route::post('/get-kelurahan', [WilayahController::class, 'getKelurahan'])->name('getKelurahan');
+    });
 
     Route::prefix('/wilayah')->name('api.')->group(function () {
         Route::post('/get-kota', [WilayahController::class, 'getKota'])->name('getKota');
         Route::post('/get-kecamatan', [WilayahController::class, 'getKecamatan'])->name('getKecamatan');
         Route::post('/get-kelurahan', [WilayahController::class, 'getKelurahan'])->name('getKelurahan');
     });
+    //scanner
+    Route::get('/scan-barang', [BarangController::class, 'scanner'])->name('admin.barang.scan');
+    Route::get('/api/cari-barang/{id}', [BarangController::class, 'cariBarang'])->name('admin.api.cari-barang');
 });
 
 /*
@@ -124,7 +179,7 @@ Route::prefix('vendor')->middleware(['auth', 'isVendor'])->group(function () {
     // 2. Pesanan Masuk
     Route::get('/pesanan', [VendorPesananController::class, 'index'])->name('vendor.pesanan.index');
 
-    // 3. Studi Kasus 3: Customer (Akses Kamera)
+    // 3. Customer (Akses Kamera)
     Route::prefix('customer')->group(function () {
         Route::get('/', [VendorCustomerController::class, 'index'])->name('vendor.customer.index');
 
@@ -144,4 +199,9 @@ Route::prefix('vendor')->middleware(['auth', 'isVendor'])->group(function () {
         Route::get('/kecamatan', [VendorCustomerController::class, 'getKecamatan'])->name('kecamatan');
         Route::get('/kelurahan', [VendorCustomerController::class, 'getKelurahan'])->name('kelurahan');
     });
+    //scanner
+    Route::get('/scan-pesanan', [VendorPesananController::class, 'scanQR'])->name('vendor.pesanan.scan_qr');
+    Route::get('/api/cek-pesanan/{id}', [VendorPesananController::class, 'cekPesanan'])->name('vendor.api.cek-pesanan');
+
+
 });

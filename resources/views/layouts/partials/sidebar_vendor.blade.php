@@ -65,6 +65,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('vendor.makanan.create') }}">Tambah Menu</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('vendor.pesanan.scan_qr') }}">Scanner Pesanan</a>
+                    </li>
                 </ul>
             </div>
         </li>

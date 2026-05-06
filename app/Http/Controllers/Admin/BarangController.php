@@ -114,4 +114,26 @@ class BarangController extends Controller
 
         return $pdf->stream('Tag_Harga_Barcode.pdf');
     }
+    //scanner
+    public function scanner()
+    {
+        return view('dashboard.admin.data_master.barang.scan');
+    }
+    public function cariBarang($id)
+    {
+        $barang = DB::table('barang')->where('id_barang', $id)->first();
+
+        if ($barang) {
+            return response()->json([
+                'success' => true,
+                'data' => $barang
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang tidak ditemukan'
+            ], 404);
+        }
+    }
+
 }

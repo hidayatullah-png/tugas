@@ -47,6 +47,11 @@
               <a class="nav-link" href="{{ route('barang.index') }}">Data Barang</a>
             @endif
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.barang.scan') }}">
+              <span class="menu-title">Scanner Barang</span>
+            </a>
+          </li>
         </ul>
       </div>
     </li>

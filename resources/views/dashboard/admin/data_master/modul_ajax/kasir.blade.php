@@ -77,6 +77,7 @@
                     method: "GET",
                     success: function (res) {
                         const b = res.data;
+                        tempBarang = b;
                         $('#nama_barang').val(b.nama);
                         $('#harga_barang').val(b.harga);
                         $('#btn_tambah').prop('disabled', false);
@@ -88,7 +89,7 @@
             }
         });
 
-        / Ketentuan E & F: Tambah ke tabel / Update Qty
+        // Ketentuan E & F: Tambah ke tabel / Update Qty
         function tambahKeKeranjang() {
             const qtyInput = parseInt($('#qty').val());
             if (qtyInput <= 0 || !tempBarang) return;
@@ -171,7 +172,7 @@
                 url: "{{ route('kasir.store') }}",
                 method: "POST",
                 data: {
-                    total_bayar: totalFinal,
+                    total_bayar: total,
                     items: keranjang,
                     _token: "{{ csrf_token() }}"
                 },
