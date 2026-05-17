@@ -8,6 +8,8 @@ use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\StudyCaseController;
+use App\Http\Controllers\KunjunganTokoController;
+
 
 // --- GUEST & VENDOR CONTROLLERS ---
 use App\Http\Controllers\GuestController;
@@ -204,4 +206,16 @@ Route::prefix('vendor')->middleware(['auth', 'isVendor'])->group(function () {
     Route::get('/api/cek-pesanan/{id}', [VendorPesananController::class, 'cekPesanan'])->name('vendor.api.cek-pesanan');
 
 
+});
+
+/*
+|--------------------------------------------------------------------------
+| Kungjungan Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/kunjungan-toko', [KunjunganTokoController::class, 'index'])->name('kunjungan.index');
+
+Route::prefix('api/kunjungan')->name('api.kunjungan.')->group(function () {
+    Route::get('/cek-toko/{barcode}', [KunjunganTokoController::class, 'cekToko'])->name('cek-toko');
+    Route::post('/verifikasi', [KunjunganTokoController::class, 'verifikasiPosisi'])->name('verifikasi');
 });

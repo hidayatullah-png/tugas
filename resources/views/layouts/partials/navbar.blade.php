@@ -28,23 +28,33 @@
           aria-expanded="false">
           <div class="nav-profile-img">
             <img src="{{ asset('assets/images/faces/face1.jpg') }}" alt="image">
-            <span class="availability-status online"></span>
+            @auth
+              <span class="availability-status online"></span>
+            @endauth
           </div>
           <div class="nav-profile-text">
-            <p class="mb-1 text-black">{{ Auth::user()->name }}</p>
+            <p class="mb-1 text-black">{{ Auth::check() ? Auth::user()->name : 'Visitor' }}</p>
           </div>
         </a>
         <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
-          <a class="dropdown-item" href="#">
-            <i class="mdi mdi-cached me-2 text-success"></i> Activity Log </a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="{{ route('logout') }}"
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="mdi mdi-logout me-2 text-primary"></i> Signout
-          </a>
-          <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-            @csrf
-          </form>
+          @auth
+            <a class="dropdown-item" href="#">
+              <i class="mdi mdi-cached me-2 text-success"></i> Activity Log </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{{ route('logout') }}"
+              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <i class="mdi mdi-logout me-2 text-primary"></i> Signout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+              @csrf
+            </form>
+          @endauth
+
+          @guest
+            <a class="dropdown-item" href="{{ route('login') }}">
+              <i class="mdi mdi-login me-2 text-success"></i> Login Sistem
+            </a>
+          @endguest
         </div>
       </li>
       <li class="nav-item d-none d-lg-block full-screen-link">

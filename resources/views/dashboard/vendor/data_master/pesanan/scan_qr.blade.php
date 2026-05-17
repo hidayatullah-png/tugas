@@ -78,6 +78,7 @@
                 console.log("Scanner stopped.");
                 processOrder(decodedText);
             });
+            {facingMode; }
         };
 
         function processOrder(orderId) {
@@ -114,7 +115,7 @@
                 });
         }
 
-        html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, onScanSuccess);
+        html5QrCode.start({ facingMode: "user" }, { fps: 10, qrbox: 250 }, onScanSuccess);
     </script>
 @endsection
 
