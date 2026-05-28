@@ -9,6 +9,7 @@ use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\StudyCaseController;
 use App\Http\Controllers\KunjunganTokoController;
+use App\Http\Controllers\AbsensiNfcController;
 
 
 // --- GUEST & VENDOR CONTROLLERS ---
@@ -218,4 +219,18 @@ Route::get('/kunjungan-toko', [KunjunganTokoController::class, 'index'])->name('
 Route::prefix('api/kunjungan')->name('api.kunjungan.')->group(function () {
     Route::get('/cek-toko/{barcode}', [KunjunganTokoController::class, 'cekToko'])->name('cek-toko');
     Route::post('/verifikasi', [KunjunganTokoController::class, 'verifikasiPosisi'])->name('verifikasi');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Absensi
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () { // Dosen/Petugas harus login
+    // Halaman Scanner NFC
+    Route::get('/absensi-nfc', [AbsensiNfcController::class, 'index'])->name('absensi.nfc.index');
+    
+    // Endpoint API untuk memproses scan NFC (Method POST)
+    Route::post('/api/absensi/proses-scan', [AbsensiNfcController::class, 'prosesScan'])->name('api.absensi.scan');
 });
