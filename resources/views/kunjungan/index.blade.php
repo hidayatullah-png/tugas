@@ -3,11 +3,11 @@
 @section('content')
     <div class="page-header">
         <h3 class="page-title">
-            <span class="page-title-icon text-white me-2" style="background-color: #3ea2c7;">
+            <span class="page-title-icon bg-gradient-primary text-white me-2">
                 <i class="mdi mdi-map-marker-radius"></i>
             </span> Data Kunjungan Toko
         </h3>
-        <a href="{{ route('kunjungan.tambah') }}" class="btn btn-sm fw-bold text-dark" style="background-color: #ffdd57;">
+        <a href="{{ route('kunjungan.tambah') }}" class="btn btn-gradient-primary btn-sm">
             <i class="mdi mdi-plus"></i> Tambah Toko
         </a>
     </div>

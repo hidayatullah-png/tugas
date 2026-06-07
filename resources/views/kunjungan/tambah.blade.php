@@ -3,7 +3,7 @@
 @section('content')
     <div class="page-header">
         <h3 class="page-title">
-            <span class="page-title-icon text-white me-2" style="background-color: #3ea2c7;">
+            <span class="page-title-icon bg-gradient-primary text-white me-2">
                 <i class="mdi mdi-store"></i>
             </span> Input Titik Awal Toko
         </h3>
@@ -39,7 +39,7 @@
                             <input type="text" class="form-control bg-light" id="acc" name="accuracy" readonly required>
                         </div>
 
-                        <button type="button" class="btn text-white w-100 mb-2" style="background-color: #3ea2c7;"
+                        <button type="button" class="btn btn-gradient-primary w-100 mb-2"
                             onclick="ambilLokasiToko()" id="btn-geoloc">
                             <i class="mdi mdi-crosshairs-gps"></i> Ambil Lokasi Toko
                         </button>

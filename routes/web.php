@@ -163,10 +163,10 @@ Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function 
 
 Route::prefix('visitor')->middleware(['auth', 'isVisitor'])->group(function () {
     Route::get('/dashboard', [VisitorBukuController::class, 'index'])->name('dashboard.visitor.index');
-    
+
     // Buku Management
     Route::resource('buku', VisitorBukuController::class)->names('visitor.buku');
-    
+
     // Kategori Management
     Route::resource('kategori', VisitorKategoriController::class)->names('visitor.kategori');
 });
@@ -257,7 +257,7 @@ Route::prefix('api/kunjungan')->name('api.kunjungan.')->group(function () {
 Route::middleware(['auth'])->group(function () { // Dosen/Petugas harus login
     // Halaman Scanner NFC
     Route::get('/absensi-nfc', [AbsensiNfcController::class, 'index'])->name('absensi.nfc.index');
-    
+
     // Endpoint API untuk memproses scan NFC (Method POST)
     Route::post('/api/absensi/proses-scan', [AbsensiNfcController::class, 'prosesScan'])->name('api.absensi.scan');
 });
@@ -281,3 +281,11 @@ Route::get('/sse/antrian', [AntrianController::class, 'streamSSE'])->name('antri
 Route::post('/api/antrian/panggil/{id}', [AntrianController::class, 'panggil']);
 Route::post('/api/antrian/terlewat/{id}', [AntrianController::class, 'tandaiTerlewat']);
 Route::post('/api/antrian/selesai/{id}', [AntrianController::class, 'selesai']);
+
+Route::get('/test-auth', function () {
+    if (\Illuminate\Support\Facades\Auth::check()) {
+        return "BERHASIL LOGIN! Kamu masuk sebagai: " . \Illuminate\Support\Facades\Auth::user()->name . " dengan Role ID: " . \Illuminate\Support\Facades\Auth::user()->role_id;
+    } else {
+        return "GAGAL! Sesi login tidak terbaca oleh browser.";
+    }
+});
