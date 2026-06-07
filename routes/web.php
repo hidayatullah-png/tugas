@@ -10,6 +10,7 @@ use App\Http\Controllers\PdfController;
 use App\Http\Controllers\StudyCaseController;
 use App\Http\Controllers\KunjunganTokoController;
 use App\Http\Controllers\AbsensiNfcController;
+use App\Http\Controllers\AntrianController;
 
 
 // --- GUEST & VENDOR CONTROLLERS ---
@@ -150,6 +151,24 @@ Route::prefix('admin')->middleware(['auth', 'isAdministrator'])->group(function 
     //scanner
     Route::get('/scan-barang', [BarangController::class, 'scanner'])->name('admin.barang.scan');
     Route::get('/api/cari-barang/{id}', [BarangController::class, 'cariBarang'])->name('admin.api.cari-barang');
+    // Manajemen Antrian Real-Time
+    Route::get('/data_master/antrian', [AntrianController::class, 'adminDashboard'])->name('admin.antrian.index');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Visitor Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('visitor')->middleware(['auth', 'isVisitor'])->group(function () {
+    Route::get('/dashboard', [VisitorBukuController::class, 'index'])->name('dashboard.visitor.index');
+    
+    // Buku Management
+    Route::resource('buku', VisitorBukuController::class)->names('visitor.buku');
+    
+    // Kategori Management
+    Route::resource('kategori', VisitorKategoriController::class)->names('visitor.kategori');
 });
 
 /*
@@ -211,11 +230,19 @@ Route::prefix('vendor')->middleware(['auth', 'isVendor'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Kungjungan Routes
+| Kunjungan Toko Routes (Geolocation)
 |--------------------------------------------------------------------------
 */
-Route::get('/kunjungan-toko', [KunjunganTokoController::class, 'index'])->name('kunjungan.index');
 
+// Rute Tampilan (Wajib Login karena butuh user_id)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/kunjungan-toko', [KunjunganTokoController::class, 'index'])->name('kunjungan.index');
+    Route::get('/kunjungan-toko/tambah-toko', [KunjunganTokoController::class, 'tambahTokoPage'])->name('kunjungan.tambah');
+    Route::post('/kunjungan-toko/store', [KunjunganTokoController::class, 'store'])->name('kunjungan.store');
+    Route::get('/kunjungan-toko/kunjungi', [KunjunganTokoController::class, 'kunjungiPage'])->name('kunjungan.kunjungi');
+});
+
+// Rute API Endpoint (Untuk AJAX Scanner)
 Route::prefix('api/kunjungan')->name('api.kunjungan.')->group(function () {
     Route::get('/cek-toko/{barcode}', [KunjunganTokoController::class, 'cekToko'])->name('cek-toko');
     Route::post('/verifikasi', [KunjunganTokoController::class, 'verifikasiPosisi'])->name('verifikasi');
@@ -234,3 +261,23 @@ Route::middleware(['auth'])->group(function () { // Dosen/Petugas harus login
     // Endpoint API untuk memproses scan NFC (Method POST)
     Route::post('/api/absensi/proses-scan', [AbsensiNfcController::class, 'prosesScan'])->name('api.absensi.scan');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Antrian Real-Time (SSE)
+|--------------------------------------------------------------------------
+*/
+// Halaman Guest
+Route::get('/guest', [AntrianController::class, 'guestForm'])->name('antrian.guest');
+Route::post('/guest/daftar', [AntrianController::class, 'submitGuest'])->name('antrian.submit');
+
+// Halaman Papan Antrian Publik
+Route::get('/papan', [AntrianController::class, 'papanAntrian'])->name('antrian.papan');
+
+// Endpoint Server-Sent Events (SSE)
+Route::get('/sse/antrian', [AntrianController::class, 'streamSSE'])->name('antrian.sse');
+
+// API Aksi Admin
+Route::post('/api/antrian/panggil/{id}', [AntrianController::class, 'panggil']);
+Route::post('/api/antrian/terlewat/{id}', [AntrianController::class, 'tandaiTerlewat']);
+Route::post('/api/antrian/selesai/{id}', [AntrianController::class, 'selesai']);

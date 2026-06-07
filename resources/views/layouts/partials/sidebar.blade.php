@@ -101,6 +101,20 @@
         </div>
       </li>
       <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan" aria-expanded="false" aria-controls="kunjungan">
+          <span class="menu-title">Kunjungan Toko</span>
+          <i class="menu-arrow"></i>
+          <i class="fa fa-inbox menu-icon"></i>
+        </a>
+        <div class="collapse" id="kunjungan">
+          <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('kunjungan.index') }}">Sales Tracking</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" data-bs-toggle="collapse" href="#absensi" aria-expanded="false" aria-controls="absensi">
           <span class="menu-title">Absensi NFC</span>
           <i class="menu-arrow"></i>
